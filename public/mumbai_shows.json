@@ -1,0 +1,86 @@
+{
+  "updated_at_ist": "Initial Seed Feed (Waiting for first hourly sync)",
+  "source": "seed",
+  "venues": [
+    { "id": "maison-bkc", "name": "Maison INOX: Jio World Plaza, BKC", "lat": 19.0672, "lng": 72.8679 },
+    { "id": "pvr-dynamic-juhu", "name": "PVR: Dynamic Mall, Juhu", "lat": 19.1124, "lng": 72.8265 },
+    { "id": "inox-megaplex-malad", "name": "INOX: Megaplex, Inorbit Mall Malad", "lat": 19.1759, "lng": 72.8351 },
+    { "id": "inox-rcity", "name": "INOX: R-City, Ghatkopar", "lat": 19.0996, "lng": 72.9164 },
+    { "id": "pvr-phoenix-kurla", "name": "PVR: Phoenix Marketcity, Kurla", "lat": 19.0865, "lng": 72.8890 },
+    { "id": "pvr-icon-lowerparel", "name": "PVR ICON: Phoenix Palladium, Lower Parel", "lat": 18.9949, "lng": 72.8245 },
+    { "id": "cinepolis-seawoods", "name": "Cinépolis: Nexus Seawoods, Navi Mumbai", "lat": 19.0222, "lng": 73.0182 },
+    { "id": "inox-raghuleela-vashi", "name": "INOX: Raghuleela Mall, Vashi", "lat": 19.0645, "lng": 72.9975 }
+  ],
+  "shows": [
+    {
+      "id": "s1", "date": "ALL", "movie": "Ramayana: Part 1", "lang": "Hindi", "format": "IMAX 2D",
+      "venueId": "maison-bkc", "basePrice": 580,
+      "times": [
+        { "time": "14:15", "seatPct": 68 },
+        { "time": "18:00", "seatPct": 42 },
+        { "time": "21:45", "seatPct": 75 }
+      ]
+    },
+    {
+      "id": "s2", "date": "ALL", "movie": "Ramayana: Part 1", "lang": "Hindi", "format": "2D",
+      "venueId": "pvr-phoenix-kurla", "basePrice": 340,
+      "times": [
+        { "time": "13:30", "seatPct": 80 },
+        { "time": "17:15", "seatPct": 24 },
+        { "time": "20:45", "seatPct": 55 }
+      ]
+    },
+    {
+      "id": "s3", "date": "ALL", "movie": "Godzilla Minus Zero", "lang": "English", "format": "4DX",
+      "venueId": "inox-megaplex-malad", "basePrice": 520,
+      "times": [
+        { "time": "15:40", "seatPct": 60 },
+        { "time": "19:10", "seatPct": 35 },
+        { "time": "22:15", "seatPct": 78 }
+      ]
+    },
+    {
+      "id": "s4", "date": "ALL", "movie": "O.M: Operation Mole", "lang": "Hindi", "format": "2D",
+      "venueId": "pvr-dynamic-juhu", "basePrice": 320,
+      "times": [
+        { "time": "16:20", "seatPct": 72 },
+        { "time": "19:45", "seatPct": 48 },
+        { "time": "22:30", "seatPct": 84 }
+      ]
+    },
+    {
+      "id": "s5", "date": "ALL", "movie": "The Hunger Games: Sunrise on the Reaping", "lang": "English", "format": "IMAX 2D",
+      "venueId": "pvr-icon-lowerparel", "basePrice": 550,
+      "times": [
+        { "time": "15:00", "seatPct": 64 },
+        { "time": "18:45", "seatPct": 28 },
+        { "time": "22:00", "seatPct": 70 }
+      ]
+    },
+    {
+      "id": "s6", "date": "ALL", "movie": "ENE Repeat", "lang": "Telugu", "format": "2D",
+      "venueId": "inox-rcity", "basePrice": 290,
+      "times": [
+        { "time": "16:45", "seatPct": 58 },
+        { "time": "20:15", "seatPct": 40 }
+      ]
+    },
+    {
+      "id": "s7", "date": "ALL", "movie": "Ramayana: Part 1", "lang": "Hindi", "format": "IMAX 2D",
+      "venueId": "cinepolis-seawoods", "basePrice": 490,
+      "times": [
+        { "time": "14:45", "seatPct": 62 },
+        { "time": "18:30", "seatPct": 38 },
+        { "time": "22:10", "seatPct": 74 }
+      ]
+    },
+    {
+      "id": "s8", "date": "ALL", "movie": "Aadi Anant", "lang": "Marathi", "format": "2D",
+      "venueId": "inox-raghuleela-vashi", "basePrice": 250,
+      "times": [
+        { "time": "17:30", "seatPct": 76 },
+        { "time": "20:30", "seatPct": 65 }
+      ]
+    }
+  ]
+}

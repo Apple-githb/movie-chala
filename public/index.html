@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Movie Chala — Live Mumbai Showtimes</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#09090b" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #09090b;
+      color: #f4f4f5;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .glass-header {
+      background: rgba(9, 9, 11, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24 selection:bg-amber-500/30 selection:text-amber-200">
+
+  <header class="sticky top-0 z-30 glass-header border-b border-zinc-800/80">
+    <div class="max-w-lg mx-auto px-4 pt-3.5 pb-3">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-zinc-950 font-extrabold text-sm shadow-lg shadow-amber-500/20">
+            MC
+          </div>
+          <div>
+            <h1 class="text-base font-extrabold tracking-tight text-white leading-none">Movie Chala</h1>
+            <p id="syncBadge" class="text-[11px] text-emerald-400 mt-0.5">● Syncing live Mumbai feed...</p>
+          </div>
+        </div>
+        <button onclick="useLiveGPS()" id="gpsBtn" class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 hover:text-white flex items-center gap-1 transition">
+          <span>📍</span> <span id="gpsLabel">Near Me</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-12 gap-2 mb-2.5">
+        <div class="col-span-7 relative">
+          <select id="hubSelect" onchange="handleHubChange()" class="w-full appearance-none bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-100 focus:outline-none focus:border-amber-500">
+            <option value="santacruz">Santacruz East / BKC</option>
+            <option value="andheri">Andheri West / Juhu</option>
+            <option value="malad">Malad / Goregaon</option>
+            <option value="ghatkopar">Ghatkopar / Kurla</option>
+            <option value="lowerparel">Lower Parel / Worli</option>
+            <option value="vashi">Vashi / Navi Mumbai</option>
+          </select>
+          <span class="pointer-events-none absolute right-2.5 top-2.5 text-[10px] text-zinc-400">▼</span>
+        </div>
+        <div class="col-span-5 flex bg-zinc-900 border border-zinc-800 rounded-xl p-0.5">
+          <button onclick="setRadius(5)" id="rad-5" class="rad-btn flex-1 rounded-lg text-[11px] font-bold py-1.5 transition">5 km</button>
+          <button onclick="setRadius(10)" id="rad-10" class="rad-btn flex-1 rounded-lg text-[11px] font-bold py-1.5 transition">10 km</button>
+          <button onclick="setRadius(35)" id="rad-35" class="rad-btn flex-1 rounded-lg text-[11px] font-bold py-1.5 transition">All</button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar mb-2.5" id="dayChips"></div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+        <button onclick="setTimeWindow('all')" id="tw-all" class="tw-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition">All Timings</button>
+        <button onclick="setTimeWindow('afternoon')" id="tw-afternoon" class="tw-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition">12 PM – 5 PM</button>
+        <button onclick="setTimeWindow('evening')" id="tw-evening" class="tw-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition">5 PM – 8 PM</button>
+        <button onclick="setTimeWindow('night')" id="tw-night" class="tw-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition">8 PM Onwards</button>
+      </div>
+    </div>
+
+    <div class="max-w-lg mx-auto px-4 py-2 border-t border-zinc-800/60 flex items-center justify-between gap-2 bg-zinc-950/60">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <select id="langFilter" onchange="renderShows()" class="bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1 text-[11px] font-semibold text-zinc-300 focus:outline-none">
+          <option value="ALL">All Languages</option>
+        </select>
+        <button onclick="toggleGoodSeats()" id="seatToggleBtn" class="shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-semibold transition">
+          💺 Good Seats Only
+        </button>
+      </div>
+      <button onclick="toggleViewMode()" id="viewModeBtn" class="shrink-0 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-amber-400">
+        🕒 By Time
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-lg mx-auto px-4 pt-3 pb-1 flex items-center justify-between text-xs text-zinc-400">
+    <span id="resultCount">Loading shows...</span>
+    <span class="text-[11px] text-zinc-500">Tap any timing to compare & book</span>
+  </div>
+
+  <main id="feedContainer" class="max-w-lg mx-auto px-4 pt-2 space-y-3"></main>
+
+  <!-- Bottom Action Drawer -->
+  <div id="bookingDrawer" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeBookingDrawer()" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+    <div class="absolute bottom-0 inset-x-0 max-w-lg mx-auto bg-zinc-900 border-t border-zinc-800 rounded-t-3xl p-5 shadow-2xl">
+      <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-4"></div>
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <span id="drawerBadge" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 mb-1"></span>
+          <h3 id="drawerMovie" class="text-lg font-extrabold text-white leading-snug"></h3>
+          <p id="drawerTheatre" class="text-xs text-zinc-400 mt-0.5"></p>
+        </div>
+        <div class="text-right shrink-0">
+          <div id="drawerTime" class="text-base font-extrabold text-amber-400"></div>
+          <div id="drawerSeatStatus" class="text-[11px] font-semibold mt-0.5"></div>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-3 mb-4">
+        <div class="flex items-center justify-between text-[11px] text-zinc-400 mb-2">
+          <span>Middle & Recliner Row Availability</span>
+          <span id="drawerSeatPct" class="font-bold text-emerald-400"></span>
+        </div>
+        <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <div id="drawerSeatBar" class="h-full bg-emerald-500 rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 mb-3">
+        <a id="linkDistrict" href="#" target="_blank" rel="noopener" class="flex items-center justify-between w-full p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-purple-500/60 transition">
+          <div>
+            <div class="text-sm font-bold text-white flex items-center gap-2">
+              District by Zomato
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-semibold">Low Conv. Fee</span>
+            </div>
+            <div class="text-[11px] text-zinc-400 mt-0.5">Est. total incl. taxes</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="priceDistrict" class="text-sm font-extrabold text-white"></span>
+            <span class="px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold">Book →</span>
+          </div>
+        </a>
+
+        <a id="linkBMS" href="#" target="_blank" rel="noopener" class="flex items-center justify-between w-full p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-rose-500/60 transition">
+          <div>
+            <div class="text-sm font-bold text-white flex items-center gap-2">
+              BookMyShow
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-semibold">Direct Deep-Link</span>
+            </div>
+            <div class="text-[11px] text-zinc-400 mt-0.5">Est. total incl. taxes</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="priceBMS" class="text-sm font-extrabold text-white"></span>
+            <span class="px-3 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold">Book →</span>
+          </div>
+        </a>
+
+        <a id="linkPVR" href="#" target="_blank" rel="noopener" class="flex items-center justify-between w-full p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-amber-500/60 transition">
+          <div>
+            <div class="text-sm font-bold text-white">Cinema Direct (PVR INOX / Cinépolis)</div>
+            <div class="text-[11px] text-zinc-400 mt-0.5">Base ticket price</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="priceDirect" class="text-sm font-extrabold text-emerald-400"></span>
+            <span class="px-3 py-1.5 rounded-xl bg-zinc-800 text-white text-xs font-bold">Open →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const HUBS = {
+      santacruz: { name: "Santacruz East / BKC", lat: 19.0760, lng: 72.8677 },
+      andheri: { name: "Andheri West / Juhu", lat: 19.1363, lng: 72.8277 },
+      malad: { name: "Malad / Goregaon", lat: 19.1760, lng: 72.8350 },
+      ghatkopar: { name: "Ghatkopar / Kurla", lat: 19.0990, lng: 72.9165 },
+      lowerparel: { name: "Lower Parel / Worli", lat: 18.9977, lng: 72.8267 },
+      vashi: { name: "Vashi / Navi Mumbai", lat: 19.0654, lng: 72.9986 }
+    };
+
+    let state = {
+      hub: "santacruz",
+      customCoords: null,
+      radius: 10,
+      dayOffset: 0,
+      timeWindow: "all",
+      lang: "ALL",
+      goodSeatsOnly: false,
+      viewMode: "card",
+      venues: [],
+      shows: []
+    };
+
+    function getTargetDateStr(offset) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}${m}${day}`;
+    }
+
+    async function loadLiveFeed() {
+      try {
+        const res = await fetch(`./mumbai_shows.json?t=${Date.now()}`);
+        const data = await res.json();
+        state.venues = data.venues || [];
+        state.shows = data.shows || [];
+        document.getElementById("syncBadge").textContent = `● Updated: ${data.updated_at_ist || "Live"}`;
+
+        // Populate dynamic languages from live feed
+        const langs = [...new Set(state.shows.map(s => s.lang).filter(Boolean))].sort();
+        const langSel = document.getElementById("langFilter");
+        langSel.innerHTML = `<option value="ALL">All Languages</option>` +
+          langs.map(l => `<option value="${l}">${l}</option>`).join("");
+
+        renderShows();
+      } catch (err) {
+        document.getElementById("syncBadge").textContent = "● Offline / Sync Error";
+      }
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function formatTime12h(hhmm) {
+      const [h, m] = hhmm.split(":").map(Number);
+      const ampm = h >= 12 ? "PM" : "AM";
+      const hr = h % 12 || 12;
+      return `${hr}:${String(m).padStart(2, "0")} ${ampm}`;
+    }
+
+    function initDays() {
+      const container = document.getElementById("dayChips");
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      container.innerHTML = "";
+      for (let i = 0; i < 2; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const label = i === 0 ? "Today" : `Tomorrow (${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]})`;
+        const active = state.dayOffset === i;
+        const btn = document.createElement("button");
+        btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+          active ? "bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20" : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+        }`;
+        btn.textContent = label;
+        btn.onclick = () => { state.dayOffset = i; initDays(); renderShows(); };
+        container.appendChild(btn);
+      }
+    }
+
+    function updateFilterStyles() {
+      [5, 10, 35].forEach(r => {
+        const el = document.getElementById(`rad-${r}`);
+        el.className = `rad-btn flex-1 rounded-lg text-[11px] font-bold py-1.5 transition ${
+          state.radius === r ? "bg-amber-500 text-zinc-950" : "text-zinc-400 hover:text-white"
+        }`;
+      });
+      ["all", "afternoon", "evening", "night"].forEach(tw => {
+        const el = document.getElementById(`tw-${tw}`);
+        el.className = `tw-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+          state.timeWindow === tw
+            ? "bg-zinc-100 text-zinc-950 border-zinc-100"
+            : "bg-zinc-900/90 text-zinc-400 border-zinc-800 hover:text-white"
+        }`;
+      });
+      const seatBtn = document.getElementById("seatToggleBtn");
+      seatBtn.className = `shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-semibold transition ${
+        state.goodSeatsOnly
+          ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
+          : "bg-zinc-900 border-zinc-800 text-zinc-400"
+      }`;
+      document.getElementById("viewModeBtn").textContent = state.viewMode === "card" ? "🕒 By Time" : "🎬 By Movie";
+    }
+
+    function setRadius(r) { state.radius = r; updateFilterStyles(); renderShows(); }
+    function setTimeWindow(tw) { state.timeWindow = tw; updateFilterStyles(); renderShows(); }
+    function toggleGoodSeats() { state.goodSeatsOnly = !state.goodSeatsOnly; updateFilterStyles(); renderShows(); }
+    function toggleViewMode() { state.viewMode = state.viewMode === "card" ? "timeline" : "card"; updateFilterStyles(); renderShows(); }
+
+    function handleHubChange() {
+      state.customCoords = null;
+      document.getElementById("gpsLabel").textContent = "Near Me";
+      state.hub = document.getElementById("hubSelect").value;
+      renderShows();
+    }
+
+    function useLiveGPS() {
+      if (!navigator.geolocation) return alert("GPS not supported in this browser.");
+      document.getElementById("gpsLabel").textContent = "Locating...";
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          state.customCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          document.getElementById("gpsLabel").textContent = "GPS Active";
+          renderShows();
+        },
+        () => {
+          document.getElementById("gpsLabel").textContent = "Near Me";
+          alert("Location permission denied. Using selected Mumbai hub.");
+        }
+      );
+    }
+
+    function matchesTimeWindow(hhmm) {
+      if (state.timeWindow === "all") return true;
+      const hour = parseInt(hhmm.split(":")[0], 10);
+      if (state.timeWindow === "afternoon") return hour >= 12 && hour < 17;
+      if (state.timeWindow === "evening") return hour >= 17 && hour < 20;
+      if (state.timeWindow === "night") return hour >= 20;
+      return true;
+    }
+
+    function renderShows() {
+      state.lang = document.getElementById("langFilter").value;
+      const origin = state.customCoords || HUBS[state.hub];
+      const targetDate = getTargetDateStr(state.dayOffset);
+      const feed = document.getElementById("feedContainer");
+      feed.innerHTML = "";
+
+      let matchedCards = [];
+      let flatTimeline = [];
+
+      state.shows.forEach(item => {
+        if (item.date !== "ALL" && item.date !== targetDate) return;
+        if (state.lang !== "ALL" && item.lang !== state.lang) return;
+        const venue = state.venues.find(v => v.id === item.venueId);
+        if (!venue) return;
+
+        const dist = haversineKm(origin.lat, origin.lng, venue.lat, venue.lng);
+        if (dist > state.radius) return;
+
+        const validTimes = item.times.filter(t => {
+          if (!matchesTimeWindow(t.time)) return false;
+          if (state.goodSeatsOnly && t.seatPct < 45) return false;
+          return true;
+        });
+
+        if (validTimes.length > 0) {
+          matchedCards.push({ ...item, venue, dist, validTimes });
+          validTimes.forEach(t => {
+            flatTimeline.push({ ...item, venue, dist, slot: t });
+          });
+        }
+      });
+
+      matchedCards.sort((a, b) => a.dist - b.dist);
+      flatTimeline.sort((a, b) => a.slot.time.localeCompare(b.slot.time));
+
+      document.getElementById("resultCount").textContent =
+        `${flatTimeline.length} showtimes across ${matchedCards.length} theatres`;
+
+      if (matchedCards.length === 0) {
+        feed.innerHTML = `
+          <div class="text-center py-12 px-4 bg-zinc-900/60 border border-zinc-800/80 rounded-3xl">
+            <div class="text-2xl mb-2">🎬</div>
+            <h3 class="text-sm font-bold text-white">No shows match this exact window</h3>
+            <p class="text-xs text-zinc-400 mt-1">Try expanding your radius to 10 km / All or switching to All Timings.</p>
+          </div>`;
+        return;
+      }
+
+      if (state.viewMode === "card") {
+        matchedCards.forEach(card => {
+          const pillsHtml = card.validTimes.map(t => {
+            const colorClass = t.seatPct >= 50
+              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25"
+              : "bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25";
+            return `<button onclick='openBookingDrawer(${JSON.stringify(card).replace(/'/g, "&apos;")}, ${JSON.stringify(t).replace(/'/g, "&apos;")})'
+              class="px-3 py-2 rounded-xl border text-xs font-extrabold transition ${colorClass}">
+              ${formatTime12h(t.time)}
+            </button>`;
+          }).join("");
+
+          const el = document.createElement("div");
+          el.className = "bg-zinc-900/90 border border-zinc-800/90 rounded-2xl p-4 shadow-sm";
+          el.innerHTML = `
+            <div class="flex items-start justify-between gap-2 mb-2.5">
+              <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="px-2 py-0.5 rounded bg-zinc-800 text-[10px] font-bold text-zinc-300">${card.lang}</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/15 text-[10px] font-bold text-amber-400">${card.format}</span>
+                </div>
+                <h2 class="text-base font-extrabold text-white leading-tight">${card.movie}</h2>
+                <p class="text-xs text-zinc-400 mt-1">${card.venue.name}</p>
+              </div>
+              <span class="shrink-0 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] font-bold text-zinc-300">
+                ${card.dist.toFixed(1)} km
+              </span>
+            </div>
+            <div class="flex flex-wrap gap-2 pt-1">${pillsHtml}</div>
+          `;
+          feed.appendChild(el);
+        });
+      } else {
+        flatTimeline.forEach(item => {
+          const badgeColor = item.slot.seatPct >= 50 ? "text-emerald-400" : "text-amber-400";
+          const el = document.createElement("div");
+          el.onclick = () => openBookingDrawer(item, item.slot);
+          el.className = "cursor-pointer bg-zinc-900/90 border border-zinc-800/90 hover:border-amber-500/50 rounded-2xl p-3.5 flex items-center justify-between gap-3 transition";
+          el.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="px-2.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-center shrink-0">
+                <div class="text-xs font-extrabold text-amber-400">${formatTime12h(item.slot.time)}</div>
+                <div class="text-[10px] font-semibold ${badgeColor}">${item.slot.seatPct >= 50 ? "Good Seats" : "Filling Fast"}</div>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-white leading-tight">${item.movie}</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5">${item.venue.name} • <span class="text-zinc-300 font-semibold">${item.dist.toFixed(1)} km</span></p>
+                <div class="text-[10px] text-zinc-500 mt-0.5">${item.lang} • ${item.format}</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-zinc-400">→</span>
+          `;
+          feed.appendChild(el);
+        });
+      }
+    }
+
+    function openBookingDrawer(card, slot) {
+      document.getElementById("drawerBadge").textContent = `${card.lang} • ${card.format}`;
+      document.getElementById("drawerMovie").textContent = card.movie;
+      document.getElementById("drawerTheatre").textContent = `${card.venue.name} (${card.dist.toFixed(1)} km away)`;
+      document.getElementById("drawerTime").textContent = formatTime12h(slot.time);
+      document.getElementById("drawerSeatStatus").textContent = slot.seatPct >= 50 ? "Good Seats Available" : "Filling Fast";
+      document.getElementById("drawerSeatStatus").className = `text-[11px] font-semibold mt-0.5 ${slot.seatPct >= 50 ? "text-emerald-400" : "text-amber-400"}`;
+      document.getElementById("drawerSeatPct").textContent = `${slot.seatPct}% open`;
+      document.getElementById("drawerSeatBar").style.width = `${slot.seatPct}%`;
+
+      const base = Number(card.basePrice || 350);
+      document.getElementById("priceDirect").textContent = `₹${base}`;
+      document.getElementById("priceDistrict").textContent = `₹${Math.round(base * 1.12)}`;
+      document.getElementById("priceBMS").textContent = `₹${Math.round(base * 1.18)}`;
+
+      const q = encodeURIComponent(`${card.movie} ${card.venue.name} Mumbai`);
+      document.getElementById("linkDistrict").href = `https://www.district.in/movies/mumbai?q=${q}`;
+      document.getElementById("linkBMS").href = slot.deepLink || `https://in.bookmyshow.com/explore/movies-mumbai?q=${q}`;
+      document.getElementById("linkPVR").href = `https://www.pvrcinemas.com/`;
+
+      document.getElementById("bookingDrawer").classList.remove("hidden");
+    }
+
+    function closeBookingDrawer() {
+      document.getElementById("bookingDrawer").classList.add("hidden");
+    }
+
+    initDays();
+    updateFilterStyles();
+    loadLiveFeed();
+  </script>
+</body>
+</html>

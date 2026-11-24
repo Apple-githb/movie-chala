@@ -1,0 +1,33 @@
+MOVIE CHALA — FULLY AUTOMATED LIVE PIPELINE (NO CODING SETUP)
+
+WHAT IS INSIDE THIS FOLDER:
+1. public/index.html             -> The Movie Chala mobile web app (automatically reads the live JSON feed).
+2. public/mumbai_shows.json      -> The live Mumbai showtime feed updated automatically every hour.
+3. scraper.py                    -> The automated script that pulls live Mumbai theatre schedules.
+4. .github/workflows/update.yml  -> The hourly scheduler that runs scraper.py while you sleep.
+
+-----------------------------------------------------------------------
+HOW TO DEPLOY THIS IN 10 MINUTES WITHOUT WRITING ANY CODE:
+-----------------------------------------------------------------------
+
+STEP 1: UPLOAD THIS FOLDER TO GITHUB (FREE)
+1. Go to github.com on your MacBook and sign in (or create a free account).
+2. Click the "+" icon at top-right -> "New repository".
+3. Name it "movie-chala", keep it Public, and click "Create repository".
+4. On the next screen, click the link "uploading an existing file".
+5. Open the extracted "movie-chala-auto" folder on your MacBook, select ALL files inside it (including the hidden .github folder — press Command + Shift + . on Mac to see hidden folders), and drag them into GitHub.
+6. Click "Commit changes".
+
+STEP 2: CONNECT YOUR PROXY KEY SO BOOKMYSHOW DOESN'T BLOCK GITHUB
+1. Sign up for a pay-as-you-go Indian Residential Proxy (such as Webshare, IPRoyal, or Bright Data — ~Rs 300/month for 1 GB, which lasts months for text schedules) and copy your HTTP Proxy URL (looks like: http://username:password@proxyhost:port).
+2. In your GitHub repository, go to: Settings -> Secrets and variables -> Actions -> "New repository secret".
+3. Name: RESIDENTIAL_PROXY_URL
+4. Secret: paste your proxy URL and click "Add secret".
+5. Click the "Actions" tab at the top of GitHub -> click "Auto-Update Mumbai Showtimes" -> click "Run workflow" to test your first live Mumbai fetch!
+
+STEP 3: PUT YOUR WEBSITE ONLINE WITH CLOUDFLARE PAGES (FREE)
+1. Go to dash.cloudflare.com -> Workers & Pages -> Create -> Pages -> "Connect to Git".
+2. Select your "movie-chala" GitHub repository.
+3. In "Build output directory", type: public
+4. Click "Save and Deploy".
+5. Every hour when GitHub updates public/mumbai_shows.json, Cloudflare automatically updates your live website for every user in Mumbai!

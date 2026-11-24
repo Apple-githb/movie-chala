@@ -1,0 +1,37 @@
+name: Auto-Update Mumbai Showtimes
+
+on:
+  schedule:
+    - cron: '0 2-17 * * *' # Runs every hour from 7:30 AM to 10:30 PM IST
+  workflow_dispatch:       # Lets you trigger a refresh anytime with 1 click
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install curl-cffi beautifulsoup4
+
+      - name: Fetch Live Mumbai Showtimes
+        env:
+          RESIDENTIAL_PROXY_URL: ${{ secrets.RESIDENTIAL_PROXY_URL }}
+        run: python scraper.py
+
+      - name: Commit & Push Updated Schedule
+        run: |
+          git config user.name "Movie Chala Bot"
+          git config user.email "bot@moviechala.in"
+          git add public/mumbai_shows.json
+          git commit -m "chore: hourly Mumbai showtimes update" || exit 0
+          git push
